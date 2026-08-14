@@ -1,0 +1,62 @@
+# One command demo: docker compose up --build
+#
+#   Frontend  http://localhost:3000
+#   API       http://localhost:5080  (Swagger at /swagger)
+#   Database  localhost:5432
+#
+# The API applies its migrations and seeds the demo data on first start, so there is
+# nothing else to run.
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: assignment-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-assignment_db}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-assignment_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: backend/src/AssignmentSystem.Api/Dockerfile
+    container_name: assignment-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__DefaultConnection: "Host=db;Port=5432;Database=${POSTGRES_DB:-assignment_db};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-postgres}"
+      Jwt__Key: ${JWT_KEY:-change-this-key-before-any-real-deployment-32chars}
+      Jwt__Issuer: AssignmentSystem
+      Jwt__Audience: AssignmentSystemClient
+      Cors__AllowedOrigins__0: ${FRONTEND_ORIGIN:-http://localhost:3000}
+      Database__ApplyMigrationsOnStartup: "true"
+      Database__SeedDemoData: "true"
+      Swagger__Enabled: "true"
+    ports:
+      - "5080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-http://localhost:5080}
+    container_name: assignment-web
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+
+volumes:
+  postgres-data:

@@ -1,0 +1,36 @@
+# --- .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+TestResults/
+coverage*.json
+coverage*.xml
+*.trx
+
+# --- Node / Next.js
+node_modules/
+.next/
+out/
+.npm
+npm-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# --- Environment / secrets
+.env
+.env.local
+.env.*.local
+appsettings.Local.json
+*.pfx
+
+# --- Editors / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# --- Build output
+publish/
+dist/
