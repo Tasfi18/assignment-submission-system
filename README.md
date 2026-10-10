@@ -191,7 +191,7 @@ For a local setup:
 ## Quick start with Docker
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/Tasfi18/assignment-submission-system.git
 cd assignment-submission-system
 
 cp .env.example .env
