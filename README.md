@@ -302,6 +302,8 @@ With coverage:
 dotnet test --collect:"XPlat Code Coverage"
 ```
 
+GitHub Actions builds the backend, runs these tests and builds the frontend on every push and pull request.
+
 The suite covers the parts that would be expensive to get wrong:
 
 | Area | Examples |
@@ -457,11 +459,6 @@ The full list, with reasoning, is in [`docs/ASSUMPTIONS.md`](docs/ASSUMPTIONS.md
 
 Honest list of what this does not do, and why.
 
-- **The code has not been compiled or run.** It was written in an environment without the .NET SDK,
-  npm registry access or a database, so nothing could be built or executed end to end. Everything
-  was written carefully against the framework APIs, but before submitting please run
-  `dotnet build`, `dotnet test` and `npm install && npm run build` once, or start
-  `docker compose up --build`, and fix anything the compiler flags.
 - **The JWT is stored in a JavaScript-readable cookie**, not an httpOnly one, so that Next.js
   middleware can guard routes before rendering. A production build should have the API set an
   httpOnly, secure, SameSite cookie instead. This is the single biggest security trade-off in the
